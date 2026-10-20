@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>B3A · Fu Tai Estate ⇄ Shenzhen Bay Port</title>
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --card: rgba(255, 255, 255, 0.055);
+    --card-hi: rgba(255, 255, 255, 0.09);
+    --line: rgba(255, 255, 255, 0.10);
+    --text: #f2f5fb;
+    --muted: #8b96ab;
+    --accent: #ffd400;
+    --accent-ink: #1b1600;
+    --ok: #37e08a;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 28px 18px;
+    background:
+      radial-gradient(900px 500px at 15% -10%, rgba(255, 212, 0, 0.16), transparent 60%),
+      radial-gradient(700px 450px at 110% 15%, rgba(60, 120, 255, 0.20), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+      "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app { width: min(520px, 100%); }
+
+  /* ---------- header ---------- */
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 26px;
+  }
+
+  .route-badge {
+    flex: none;
+    width: 66px;
+    height: 66px;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    box-shadow: 0 12px 30px -12px rgba(255, 212, 0, 0.75);
+  }
+
+  .head-text { min-width: 0; }
+
+  .od {
+    font-size: 18px;
+    font-weight: 650;
+    line-height: 1.3;
+    letter-spacing: -0.2px;
+  }
+
+  .od .arrow {
+    color: var(--muted);
+    padding: 0 1px;
+  }
+
+  .od-sub {
+    margin-top: 3px;
+    font-size: 13.5px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ---------- direction groups ---------- */
+  .group + .group {
+    margin-top: 28px;
+    padding-top: 26px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .group-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 4px 12px;
+  }
+
+  .group-arrow {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 212, 0, 0.12);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .group-title {
+    font-size: 15.5px;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+  }
+
+  .group-sub {
+    margin-top: 3px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.01em;
+  }
+
+  /* ---------- board ---------- */
+  .board {
+    display: grid;
+    gap: 10px;
+  }
+
+  .bus {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 15px 22px;
+    border: 1px solid var(--line);
+    border-radius: 19px;
+    background: var(--card);
+    backdrop-filter: blur(14px);
+    transition: background 0.2s ease;
+  }
+
+  .bus.next {
+    background: var(--card-hi);
+    border-color: rgba(255, 212, 0, 0.42);
+    box-shadow: 0 0 0 1px rgba(255, 212, 0, 0.08), 0 24px 50px -34px rgba(255, 212, 0, 0.55);
+  }
+
+  .bus-main {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .num {
+    font-size: 43px;
+    font-weight: 750;
+    line-height: 0.95;
+    letter-spacing: -2px;
+  }
+
+  .unit {
+    font-size: 13.5px;
+    color: var(--muted);
+    font-weight: 550;
+  }
+
+  .bus.next .num { color: var(--accent); }
+
+  .bus-side {
+    text-align: right;
+    flex: none;
+  }
+
+  .clock {
+    font-size: 16px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .tag {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+
+  .bus.next .tag {
+    color: var(--accent);
+    border-color: rgba(255, 212, 0, 0.35);
+    background: rgba(255, 212, 0, 0.08);
+  }
+
+  /* ---------- notices ---------- */
+  .notice {
+    border: 1px dashed var(--line);
+    border-radius: 19px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 22px 20px;
+    text-align: center;
+  }
+
+  .notice .big { font-size: 14.5px; font-weight: 600; margin-bottom: 5px; }
+  .notice .small { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  /* ---------- footer ---------- */
+  .foot {
+    margin-top: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12.5px;
+    color: var(--muted);
+    padding: 0 4px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 0 rgba(55, 224, 138, 0.5);
+    animation: pulse 2.4s infinite;
+  }
+
+  .dot.off { background: #ff6b6b; animation: none; }
+
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(55, 224, 138, 0.45); }
+    70%  { box-shadow: 0 0 0 7px rgba(55, 224, 138, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(55, 224, 138, 0); }
+  }
+
+  .foot .sep { opacity: 0.35; }
+
+  .bar {
+    margin-top: 12px;
+    height: 2px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  .bar > i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, rgba(255, 212, 0, 0.35), var(--accent));
+    transition: width 0.9s linear;
+  }
+
+  @media (max-width: 400px) {
+    .route-badge { width: 58px; height: 58px; font-size: 24px; border-radius: 16px; }
+    .od { font-size: 16px; }
+    .num { font-size: 38px; }
+    .bus { padding: 13px 17px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot { animation: none; }
+    .bar > i { transition: none; }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="head">
+    <div class="route-badge" aria-hidden="true">B3A</div>
+    <div class="head-text">
+      <div class="od">Fu Tai Estate <span class="arrow">⇄</span> Shenzhen Bay Port</div>
+      <div class="od-sub">富泰邨 ⇄ 深圳灣口岸 · Citybus</div>
+    </div>
+  </header>
+
+  <section class="group" aria-labelledby="title-to-szb">
+    <div class="group-head">
+      <span class="group-arrow" aria-hidden="true">→</span>
+      <div>
+        <div class="group-title" id="title-to-szb">To Shenzhen Bay Port</div>
+        <div class="group-sub">from Fu Tai Estate · 富泰邨開</div>
+      </div>
+    </div>
+    <div class="board" id="board-to-szb" aria-live="polite" aria-atomic="true"></div>
+  </section>
+
+  <section class="group" aria-labelledby="title-to-fu-tai">
+    <div class="group-head">
+      <span class="group-arrow" aria-hidden="true">→</span>
+      <div>
+        <div class="group-title" id="title-to-fu-tai">To Fu Tai Estate</div>
+        <div class="group-sub">from Shenzhen Bay Port · 深圳灣口岸開</div>
+      </div>
+    </div>
+    <div class="board" id="board-to-fu-tai" aria-live="polite" aria-atomic="true"></div>
+  </section>
+
+  <footer class="foot">
+    <span class="dot" id="dot"></span>
+    <span id="status">Connecting…</span>
+    <span class="sep">·</span>
+    <span>every 30s</span>
+    <span class="sep">·</span>
+    <span>DATA.GOV.HK</span>
+  </footer>
+
+  <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const REFRESH_MS = 30000;
+  const MAX_BUSES = 3;
+
+  /**
+   * Stop IDs from data.gov.hk / Citybus:
+   *   003261  Fu Tai Estate, Castle Peak Road   — citybound, dir "O"
+   *   003208  Shenzhen Bay Port                 — return, dir "I" (terminus: Shan King Estate)
+   */
+  const BOARDS = [
+    {
+      el: document.getElementById("board-to-szb"),
+      stop: "003261",
+      dir: "O",
+      dest: /Shenzhen Bay/i,
+      buses: [],
+      failed: false,
+      loaded: false,
+    },
+    {
+      el: document.getElementById("board-to-fu-tai"),
+      stop: "003208",
+      dir: "I",
+      dest: /Shan King/i,
+      buses: [],
+      failed: false,
+      loaded: false,
+    },
+  ];
+
+  const statusEl = document.getElementById("status");
+  const dot = document.getElementById("dot");
+  const bar = document.getElementById("bar");
+
+  let fetchedAt = 0;
+  let cycleStart = 0;
+  let anySuccess = false;
+  let attempts = 0;
+
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const clock = (ms) => {
+    const d = new Date(ms);
+    return pad(d.getHours()) + ":" + pad(d.getMinutes());
+  };
+
+  function minutesUntil(ms, now) {
+    return Math.max(0, Math.round((ms - now) / 60000));
+  }
+
+  function placeholder(big, small) {
+    return (
+      '<div class="notice"><div class="big">' + big + "</div>" +
+      '<div class="small">' + small + "</div></div>"
+    );
+  }
+
+  function renderBoard(board, now) {
+    if (!board.loaded) {
+      board.el.innerHTML = placeholder("Loading departures…", "Citybus open data");
+      return;
+    }
+
+    if (board.failed && !board.buses.length) {
+      board.el.innerHTML = placeholder(
+        "Live data unavailable",
+        "Could not reach the Citybus feed. Retrying automatically."
+      );
+      return;
+    }
+
+    const live = board.buses.filter((b) => b.eta >= now - 30000).slice(0, MAX_BUSES);
+
+    if (!live.length) {
+      board.el.innerHTML = placeholder(
+        "No upcoming buses",
+        "No B3A departures are currently scheduled. Check again later."
+      );
+      return;
+    }
+
+    board.el.innerHTML = live
+      .map((b, i) => {
+        const mins = minutesUntil(b.eta, now);
+        const soon = mins <= 0;
+        const label = soon ? "Due" : "min";
+        const num = soon ? "&middot;" : mins;
+        const tag = i === 0 ? "Next bus" : "Then";
+        return (
+          '<article class="bus' + (i === 0 ? " next" : "") + '">' +
+            '<div class="bus-main">' +
+              '<span class="num">' + num + "</span>" +
+              '<span class="unit">' + label + "</span>" +
+            "</div>" +
+            '<div class="bus-side">' +
+              '<div class="clock">' + clock(b.eta) + "</div>" +
+              '<span class="tag">' + tag + "</span>" +
+            "</div>" +
+          "</article>"
+        );
+      })
+      .join("");
+  }
+
+  function render() {
+    const now = Date.now();
+    BOARDS.forEach((b) => renderBoard(b, now));
+  }
+
+  function setStatus() {
+    if (attempts === 0) {
+      statusEl.textContent = "Connecting…";
+      return;
+    }
+    const allDown = BOARDS.every((b) => b.failed);
+    if (!anySuccess || allDown) {
+      statusEl.textContent = "Reconnecting…";
+      dot.classList.add("off");
+      return;
+    }
+    dot.classList.remove("off");
+    statusEl.textContent = "Updated " + clock(fetchedAt);
+  }
+
+  async function loadBoard(board) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12000);
+
+    try {
+      const url =
+        "https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/" +
+        board.stop +
+        "/B3A?t=" +
+        Math.floor(Date.now() / 1000);
+
+      const res = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+
+      const json = await res.json();
+      const rows = Array.isArray(json && json.data) ? json.data : [];
+
+      board.buses = rows
+        .map((r) => ({
+          eta: Date.parse(r.eta),
+          dir: r.dir,
+          dest: r.dest_en || "",
+        }))
+        .filter(
+          (b) =>
+            b.dir === board.dir &&
+            Number.isFinite(b.eta) &&
+            board.dest.test(b.dest)
+        )
+        .sort((a, b) => a.eta - b.eta);
+
+      board.failed = false;
+    } catch (err) {
+      // Keep showing the previous list if there is one.
+      board.failed = true;
+    } finally {
+      clearTimeout(timer);
+      board.loaded = true;
+    }
+  }
+
+  async function load() {
+    cycleStart = Date.now();
+    await Promise.all(BOARDS.map(loadBoard));
+    attempts++;
+
+    if (BOARDS.some((b) => !b.failed)) {
+      anySuccess = true;
+      fetchedAt = Date.now();
+    }
+
+    setStatus();
+    render();
+  }
+
+  // Tick the minutes every second, and refresh the feed every 30 seconds.
+  setInterval(() => {
+    render();
+    const pct = Math.min(1, (Date.now() - cycleStart) / REFRESH_MS);
+    bar.style.width = (pct * 100).toFixed(1) + "%";
+  }, 1000);
+
+  setInterval(load, REFRESH_MS);
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && Date.now() - cycleStart > REFRESH_MS) load();
+  });
+
+  render();
+  setStatus();
+  load();
+})();
+</script>
+</body>
+</html>
